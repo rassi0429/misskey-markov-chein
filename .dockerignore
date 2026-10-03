@@ -1,0 +1,9 @@
+*
+!Dockerfile
+!package.json
+!config.mjs
+!server.mjs
+!markov.mjs
+!remote.mjs
+!public/
+!public/**

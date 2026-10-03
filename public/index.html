@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Misskey Markov</title>
+  <link rel="stylesheet" href="/style.css"><script src="/app.js" type="module"></script>
+</head>
+<body>
+  <header><a class="brand" href="/">mm<span class="brand-dot">・</span></a><span>MISSKEY MARKOV</span></header>
+  <main>
+    <section class="intro"><p class="eyebrow">マルコフ連鎖の文章生成ツール</p><p>Misskeyと連携して、自分の公開ノートを取得します。<br>取得した本文を使って、マルコフ連鎖で文章を生成します。</p></section>
+    <div class="workspace">
+      <section class="source panel" aria-labelledby="source-title">
+        <div class="section-heading"><h2 id="source-title">ノート取得</h2></div>
+        <form id="login-form"><label for="host">Misskeyサーバー</label><div class="server-field"><span>https://</span><input id="host" name="host" value="misskey.resonite.love" placeholder="misskey.example" required autocomplete="off" spellcheck="false"></div><button id="login" class="primary" type="submit">Misskeyと連携する <span aria-hidden="true">↗</span></button></form>
+        <div id="account" class="account" hidden><strong id="account-name"></strong><small id="account-host"></small></div>
+        <div class="import-options"><p>公開ノートの本人の文章だけを使います。公開の返信とチャンネルのノートも対象です。</p></div>
+        <div class="actions"><button id="import" class="secondary" disabled>ノートを取得する</button><button id="stop" class="text-button" hidden>中断</button></div>
+        <div class="progress"><div><span>本文のある公開ノート</span><strong><span id="count">0</span><small> 件</small></strong></div><p id="progress-text" role="status">Misskeyと連携してください。</p><div id="activity" hidden></div></div>
+        <button id="forget" class="text-button danger" hidden>連携・学習データを削除する</button>
+      </section>
+      <section class="output panel" aria-labelledby="output-title">
+        <div class="section-heading"><h2 id="output-title">文章生成</h2></div>
+        <div class="note-sheet"><div class="sheet-header"><span class="note-label">生成結果</span><a id="share" class="text-button share-link" target="_blank" rel="noopener noreferrer" aria-disabled="true" tabindex="-1">投稿画面を開く <span aria-hidden="true">↗</span></a></div><p id="result" aria-live="polite">ノートを取得して、<br>「生成する」を押してください。</p><div class="sheet-footer"><span id="result-meta">未生成</span><button id="copy" class="text-button" disabled>コピー</button></div></div>
+        <div class="settings"><div><label for="order">前の何語を使うか</label><select id="order"><option value="1">1語</option><option value="2" selected>2語</option><option value="3">3語</option></select></div><div><label for="length">最大文字数</label><select id="length"><option value="70">70字</option><option value="140" selected>140字</option><option value="300">300字</option></select></div></div>
+        <button id="generate" class="generate" disabled>生成する <span aria-hidden="true">↻</span></button>
+        <p class="output-hint">語数が少ないほど混ざりやすく、多いほど元の言い回しが残ります。</p>
+        <div class="posting"><p id="post-target">本文を生成すると、投稿画面を新しいタブで開けます。</p><p class="output-hint">本文が入力された状態で開きます。公開範囲を選び、Misskey側で投稿してください。</p></div>
+        <div id="history" class="history" hidden><h3>生成履歴（直近5件）</h3><div id="history-items"></div></div>
+      </section>
+    </div>
+    <p id="message" role="alert" hidden></p>
+    <footer><p>データはこのサーバーのメモリに保存。削除・再起動・24時間の未使用で消えます。<br>生成文には元のノートの一部が出ることもあります。投稿前に内容を確認してください。</p></footer>
+  </main>
+</body>
+</html>
