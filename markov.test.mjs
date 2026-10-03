@@ -14,16 +14,16 @@ test('URLs and mentions are not learned', () => {
 });
 
 test('custom emoji receive extra probability while preserving learned frequency', () => {
-  const candidates = [':resonite:', '猫', '猫'];
-  // Uniform random samples: learned odds 1:2 become 3:2 with weight 3.
+  const candidates = [':resonite:', '猫', '猫', '猫', '猫', '猫'];
+  // Uniform random samples: learned odds 1:5 become 5:5 with weight 5.
   let normal = 0, boosted = 0;
   for (let i = 0; i < 3000; i++) {
     const random = () => (i + 0.5) / 3000;
     if (pickNext(candidates, random, 1) === ':resonite:') normal++;
-    if (pickNext(candidates, random, 3) === ':resonite:') boosted++;
+    if (pickNext(candidates, random, 5) === ':resonite:') boosted++;
   }
-  assert.equal(normal, 1000);
-  assert.equal(boosted, 1800);
+  assert.equal(normal, 500);
+  assert.equal(boosted, 1500);
 });
 
 test('emoji weight leaves ordinary words, punctuation, Unicode emoji and ending unchanged', () => {

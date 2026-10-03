@@ -32,13 +32,13 @@ export class Markov {
       }
     }
   }
-  generate(maxLength = 140, random = Math.random, emojiWeight = 1) {
+  generate(maxLength = 140, random = Math.random) {
     for (let attempt = 0; attempt < 250; attempt++) {
       let state = Array(this.order).fill(null), output = '';
       for (let step = 0; step < 400; step++) {
         const options = this.transitions.get(JSON.stringify(state));
         if (!options?.length) break;
-        const next = pickNext(options, random, emojiWeight);
+        const next = pickNext(options, random, 5);
         if (next === null) break;
         if (Array.from(output + next).length > maxLength) break;
         output += next;

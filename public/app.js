@@ -50,7 +50,7 @@ $('import').addEventListener('click', () => action(async () => { await api('impo
 $('stop').addEventListener('click', () => action(async () => { await api('stop', {}); }));
 $('forget').addEventListener('click', () => action(async () => { await api('forget', {}); clearOutput(); }));
 $('generate').addEventListener('click', () => action(async () => {
-  const data = await api('generate', { order: Number($('order').value), length: Number($('length').value), emojiWeight: Number($('emoji-weight').value) });
+  const data = await api('generate', { order: Number($('order').value), length: Number($('length').value) });
   const { text } = data;
   if (currentText) { history.unshift({ text: currentText, host: currentHost }); history.length = Math.min(history.length, 5); }
   currentHost = latestState.host;
