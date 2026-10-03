@@ -105,9 +105,10 @@ export const server = http.createServer(async (req, res) => {
     if (url.pathname === '/api/generate') {
       if (!s.texts.length) throw new Error('先にMisskeyと連携し、ノートを取得してください。');
       const order = Number(input.order || 2), length = Number(input.length || 140);
-      if (![1, 2, 3].includes(order) || !Number.isInteger(length) || length < 30 || length > 500) throw new Error('生成設定を確認してください。');
+      const emojiWeight = Number(input.emojiWeight ?? 2);
+      if (![1, 2, 3].includes(order) || !Number.isInteger(length) || length < 30 || length > 500 || ![1, 2, 3, 5].includes(emojiWeight)) throw new Error('生成設定を確認してください。');
       if (!s.models.has(order)) s.models.set(order, new Markov(s.texts, order));
-      const text = s.models.get(order).generate(length);
+      const text = s.models.get(order).generate(length, Math.random, emojiWeight);
       return json(res, { text });
     }
     return json(res, { error: 'APIが見つかりません。' }, 404);

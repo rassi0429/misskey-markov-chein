@@ -1,7 +1,18 @@
 const segmenter = new Intl.Segmenter('ja', { granularity: 'word' });
+const customEmoji = /^:[a-zA-Z0-9_]+:$/;
 export function tokenize(text) {
-  return text.split(/(:[a-zA-Z0-9_]+:)/g).flatMap(part => /^:[a-zA-Z0-9_]+:$/.test(part)
+  return text.split(/(:[a-zA-Z0-9_]+:)/g).flatMap(part => customEmoji.test(part)
     ? [part] : [...segmenter.segment(part)].map(s => s.segment));
+}
+export function pickNext(options, random, emojiWeight) {
+  if (emojiWeight === 1) return options[Math.floor(random() * options.length)];
+  const weight = token => customEmoji.test(token) ? emojiWeight : 1;
+  let remaining = random() * options.reduce((total, token) => total + weight(token), 0);
+  for (const token of options) {
+    remaining -= weight(token);
+    if (remaining < 0) return token;
+  }
+  return options.at(-1);
 }
 export function clean(text) {
   return text.replace(/https?:\/\/\S+/g, '').replace(/@[\w.-]+(?:@[\w.-]+)?/g, '')
@@ -21,13 +32,13 @@ export class Markov {
       }
     }
   }
-  generate(maxLength = 140, random = Math.random) {
+  generate(maxLength = 140, random = Math.random, emojiWeight = 1) {
     for (let attempt = 0; attempt < 250; attempt++) {
       let state = Array(this.order).fill(null), output = '';
       for (let step = 0; step < 400; step++) {
         const options = this.transitions.get(JSON.stringify(state));
         if (!options?.length) break;
-        const next = options[Math.floor(random() * options.length)];
+        const next = pickNext(options, random, emojiWeight);
         if (next === null) break;
         if (Array.from(output + next).length > maxLength) break;
         output += next;
@@ -36,6 +47,6 @@ export class Markov {
       output = output.trim();
       if (Array.from(output).length >= 8 && !this.originals.has(output)) return output;
     }
-    throw new Error('新しい文章を作れませんでした。ノートを増やすか、まとまり具合を下げてください。');
+    throw new Error('新しい文章を作れませんでした。ノートを増やすか、使う語数を減らしてください。');
   }
 }

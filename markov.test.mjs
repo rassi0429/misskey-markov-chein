@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { Markov, tokenize, clean } from './markov.mjs';
+import { Markov, tokenize, clean, pickNext } from './markov.mjs';
 import { normalizeHost, publicIPv4 } from './remote.mjs';
 
 test('Japanese tokenization preserves whitespace and custom emoji', () => {
@@ -11,6 +11,27 @@ test('Japanese tokenization preserves whitespace and custom emoji', () => {
 });
 test('URLs and mentions are not learned', () => {
   assert.equal(clean('@friend@example.com 今日は晴れ https://example.com/a'), '今日は晴れ');
+});
+
+test('custom emoji receive extra probability while preserving learned frequency', () => {
+  const candidates = [':resonite:', '猫', '猫'];
+  // Uniform random samples: learned odds 1:2 become 3:2 with weight 3.
+  let normal = 0, boosted = 0;
+  for (let i = 0; i < 3000; i++) {
+    const random = () => (i + 0.5) / 3000;
+    if (pickNext(candidates, random, 1) === ':resonite:') normal++;
+    if (pickNext(candidates, random, 3) === ':resonite:') boosted++;
+  }
+  assert.equal(normal, 1000);
+  assert.equal(boosted, 1800);
+});
+
+test('emoji weight leaves ordinary words, punctuation, Unicode emoji and ending unchanged', () => {
+  const candidates = ['猫', '。', '🍵', ':', null];
+  for (let i = 0; i < 100; i++) {
+    const random = () => (i + 0.5) / 100;
+    assert.equal(pickNext(candidates, random, 5), pickNext(candidates, random, 1));
+  }
 });
 test('generation recombines corpus and respects character limit', () => {
   const texts = ['今日は猫と遊んできた。とても楽しかった。', '今日は友達と遊んできた。気づいたら朝だった。', '昨日は猫と寝ていた。気づいたら朝だった。'];
